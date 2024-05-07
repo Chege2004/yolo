@@ -12,7 +12,7 @@ RUN npm install
 
 #Copy the rest of the application code from root to working directory
 COPY . .
-
+RUN npm run build
 #Expose the port which the container will run 
 EXPOSE 3000
 
