@@ -1,0 +1,60 @@
+- hosts: all
+  gather_facts: false
+  connection: local
+  become: true
+  become_method: sudo
+  become_user: manasseh
+  become_flags: '-H -S'
+  tasks:
+    - name: Clone repository from GitHub
+      git:
+        repo: 'git@github.com:Chege2004/yolo.git'
+        dest: /tmp/yolo
+        accept_hostkey: yes 
+        key_file: /.ssh  
+
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_version
+      ignore_errors: true
+
+    - name: Install Docker if not already installed
+      apt:
+        name: docker.io
+        state: present
+      when: docker_version.rc != 0
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Build client Docker image
+      docker_image:
+        name: client-image
+        build: 
+          path: "/home/manasseh/yolo/client"
+        source: build
+        
+
+    - name: Run client container
+      docker_container:
+        name: client-container
+        image: client-image
+        ports:
+          - "3000:3000"
+
+    - name: Build backend Docker image
+      docker_image:
+        name: backend-image
+        build: 
+          path: "/home/manasseh/yolo/backend"
+        source: build
+        
+
+    - name: Run backend container
+      docker_container:
+        name: backend-container
+        image: backend-image
+        ports:
+          - "5000:5000"
