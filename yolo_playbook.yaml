@@ -24,37 +24,63 @@
         state: present
       when: docker_version.rc != 0
 
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
+#     - name: Start Docker service
+#       service:
+#         name: docker
+#         state: started
 
-    - name: Build client Docker image
-      docker_image:
-        name: client-image
-        build: 
-          path: "/home/manasseh/yolo/client"
-        source: build
+#     - name: Build client Docker image
+#       docker_image:
+#         name: client-image
+#         build: 
+#           path: "/home/manasseh/yolo/client"
+#         source: build
         
 
-    - name: Run client container
-      docker_container:
-        name: client-container
-        image: client-image
-        ports:
-          - "3000:3000"
+#     - name: Run client container
+#       docker_container:
+#         name: client-container
+#         image: client-image
+#         ports:
+#           - "3000:3000"
 
-    - name: Build backend Docker image
-      docker_image:
-        name: backend-image
-        build: 
-          path: "/home/manasseh/yolo/backend"
-        source: build
+#     - name: Build backend Docker image
+#       docker_image:
+#         name: backend-image
+#         build: 
+#           path: "/home/manasseh/yolo/backend"
+#         source: build
         
 
-    - name: Run backend container
-      docker_container:
-        name: backend-container
-        image: backend-image
-        ports:
-          - "5000:5000"
+#     - name: Run backend container
+#       docker_container:
+#         name: backend-container
+#         image: backend-image
+#         ports:
+#           - "5000:5000"
+
+    - name: Ensure destination directory exists
+      file:
+        path: /home/manasseh/yolo/
+        state: directory
+        owner: manasseh
+        group: manasseh
+        mode: '0755'
+
+    - name: Copy project files to VM
+      shell: rsync -av /home/manasseh/yolo/ /home/manasseh/yolo/
+
+
+
+    - name: Set ownership and permissions of project files
+      file:
+        path: /home/manasseh/yolo/
+        recurse: yes
+        owner: manasseh
+        group: manasseh
+        mode: '0755'
+
+    - name: Run docker-compose up
+      command: docker-compose up -d
+      args:
+        chdir: /home/manasseh/yolo
