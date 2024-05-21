@@ -1,0 +1,78 @@
+# ROLES
+# 1 CLONE-REPO
+First we need to clone the repository on the environment we are to create for this I did the following:
+name: Provides a descriptive name for the task.
+git: Specifies the Ansible module used for Git operations.
+repo: URL of the Git repository to clone.
+dest: Destination directory on the remote server where the repository will be cloned.
+accept_hostkey: Automatically accept the host key of the Git server.
+key_file: Specifies the path to the SSH key file used for authentication.
+ I used ssh since its more secure that https 
+
+ # 2 Check-docker-presence
+ Since our project needs to run in  docker environment we neeed to ensure docker is configured in the vm for that we do:
+ name: Descriptive name for the task.
+command: Specifies the Ansible module used to run commands on the remote server.
+docker --version: The command to be executed, which checks the installed version of Docker.
+register: Saves the output of the command to a variable named docker_version.
+ignore_errors: Allows the playbook to continue executing even if the Docker command fails (e.g., if Docker is not installed).
+
+# 3 Install-docker
+Since we checked whether docker is installed we need now to install docker that is if it is not installed and to properly configure this I did:
+name: Descriptive name for the task.
+apt: Specifies the Ansible module used to manage packages on Debian-based systems.
+name: Name of the package to be installed, in this case, docker.io.
+state: Ensures the package is present (installed).
+when: Conditional statement that checks if Docker is not installed by verifying if the return code (rc) from the previous docker --version command is not equal to 0. If Docker is not installed, this condition will be true and the task will execute.
+
+# 4 Directory-Destination
+I needed to create a directory in which I would copy my project files:
+name: Descriptive name for the task.
+file: Specifies the Ansible module used to manage files and directories.
+path: The path of the directory to be ensured, in this case, /home/manasseh/yolo/.
+state: Ensures the path is a directory. If it does not exist, it will be created.
+owner: Sets the owner of the directory to manasseh.
+group: Sets the group of the directory to manasseh.
+mode: Sets the permissions of the directory to 0755 (read, write, and execute permissions for the owner, and read and execute permissions for the group and others).
+
+# 5 Copy files
+After creating the directory I needed to copy the project files into the directory:
+name: Descriptive name for the task.
+shell: Specifies the Ansible module used to run shell commands on the remote server.
+rsync -av /home/manasseh/yolo/ /home/manasseh/yolo/: The shell command to be executed. rsync is used to synchronize files and directories. The -a option enables archive mode, preserving permissions, timestamps, etc., and -v enables verbose mode. The command copies files from the source directory /home/manasseh/yolo/ to the destination directory /home/manasseh/yolo/. However, note that in this specific example, the source and destination directories are the same, so this command would effectively do nothing.
+
+# 6 I needed to set ownership permissions
+
+This Ansible playbook task sets the ownership and permissions of the project files in a specified directory. Here's a brief explanation:
+
+name: Descriptive name for the task.
+file: Specifies the Ansible module used to manage files and directories.
+path: The directory whose ownership and permissions are to be set, in this case, /home/manasseh/yolo/.
+recurse: Applies the settings recursively to all files and subdirectories within the specified directory.
+owner: Sets the owner of the directory and its contents to manasseh.
+group: Sets the group of the directory and its contents to manasseh.
+mode: Sets the permissions of the directory and its contents to 0755 (read, write, and execute permissions for the owner, and read and execute permissions for the group and others).
+Why This Is Needed:
+Ensure Proper Access: Setting the correct ownership and permissions ensures that the intended user (manasseh) has the appropriate access to the files, which is crucial for operations such as editing, running, and managing the files.
+Security: Ensuring that files have the correct permissions reduces the risk of unauthorized access or modifications. For instance, only the owner has write access, while others have limited access.
+Consistency: Applying ownership and permissions recursively ensures that all files and subdirectories within the specified directory have uniform access controls, avoiding potential issues where some files might be inaccessible or improperly secured.
+Automation and Maintenance: Automating these settings ensures that every deployment or update maintains consistent access policies, which is essential for reproducible and reliable operations.
+
+# 7 Docker compose
+At first I ran the project from scrath by cloning it then building the images and running the containers to ensure everything was configure well then i later on commented the section out since the program was well configure and edited my playbook to ran the docker compose file once I ran vagrant up :
+This Ansible playbook task runs the docker-compose up command to start Docker containers defined in a docker-compose.yml file. Here's a brief explanation:
+
+name: Descriptive name for the task.
+command: Specifies the Ansible module used to run commands on the remote server.
+docker-compose up -d: The command to start the Docker containers in detached mode (running in the background).
+args: Additional arguments for the command module.
+chdir: Changes the working directory to /home/manasseh/yolo before executing the command. This is where the docker-compose.yml file is expected to be located.
+Why This Is Needed:
+Container Orchestration: docker-compose up is used to define and run multi-container Docker applications. It reads the docker-compose.yml file to start the defined services.
+Detached Mode: The -d flag runs the containers in the background, allowing other tasks or commands to be executed without waiting for the containers to finish running.
+Correct Directory: Using chdir ensures that the command is executed in the correct directory where the docker-compose.yml file resides, which is necessary for the docker-compose command to find and read the configuration file.
+Automation and Deployment: Automating the execution of docker-compose up ensures consistent deployment and startup of services, which is critical for continuous deployment and integration workflows.
+
+
+
+
