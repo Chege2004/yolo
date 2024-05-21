@@ -1,0 +1,7 @@
+- name: Ensure destination directory exists
+  file:
+        path: /home/manasseh/yolo/
+        state: directory
+        owner: manasseh
+        group: manasseh
+        mode: '0755'

@@ -1,0 +1,5 @@
+---
+# tasks file for copy-files
+ - name: Copy project files to VM
+   shell: rsync -av /home/manasseh/yolo/ /home/manasseh/yolo/
+

@@ -5,24 +5,18 @@
   become_method: sudo
   become_user: manasseh
   become_flags: '-H -S'
-  tasks:
-    - name: Clone repository from GitHub
-      git:
-        repo: 'git@github.com:Chege2004/yolo.git'
-        dest: /tmp/yolo
-        accept_hostkey: yes 
-        key_file: /.ssh  
+  roles:
+    - clone-repo
+    - check-docker-installation
+    - docker-install
+    - directory-destination
+    - copy-files
+    - ownership-permission
+    - docker-compose-up
+   
 
-    - name: Check if Docker is installed
-      command: docker --version
-      register: docker_version
-      ignore_errors: true
-
-    - name: Install Docker if not already installed
-      apt:
-        name: docker.io
-        state: present
-      when: docker_version.rc != 0
+    
+    
 
 #     - name: Start Docker service
 #       service:
@@ -59,28 +53,11 @@
 #         ports:
 #           - "5000:5000"
 
-    - name: Ensure destination directory exists
-      file:
-        path: /home/manasseh/yolo/
-        state: directory
-        owner: manasseh
-        group: manasseh
-        mode: '0755'
+    
 
-    - name: Copy project files to VM
-      shell: rsync -av /home/manasseh/yolo/ /home/manasseh/yolo/
+   
 
 
+   
 
-    - name: Set ownership and permissions of project files
-      file:
-        path: /home/manasseh/yolo/
-        recurse: yes
-        owner: manasseh
-        group: manasseh
-        mode: '0755'
-
-    - name: Run docker-compose up
-      command: docker-compose up -d
-      args:
-        chdir: /home/manasseh/yolo
+   

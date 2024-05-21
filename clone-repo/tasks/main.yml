@@ -1,0 +1,9 @@
+---
+# tasks file for clone-repo
+
+ - name: Clone repository from GitHub
+   git:
+        repo: 'git@github.com:Chege2004/yolo.git'
+        dest: /tmp/yolo
+        accept_hostkey: yes 
+        key_file: /.ssh  

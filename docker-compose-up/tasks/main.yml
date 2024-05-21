@@ -1,0 +1,6 @@
+---
+# tasks file for docker-compose-up
+ - name: Run docker-compose up
+   command: docker-compose up -d
+   args:
+        chdir: /home/manasseh/yolo

@@ -1,0 +1,9 @@
+---
+# tasks file for ownership-permission
+ - name: Set ownership and permissions of project files
+   file:
+        path: /home/manasseh/yolo/
+        recurse: yes
+        owner: manasseh
+        group: manasseh
+        mode: '0755'

@@ -1,0 +1,8 @@
+---
+# tasks file for docker-install
+
+- name: Install Docker if not already installed
+  apt:
+        name: docker.io
+        state: present
+  when: docker_version.rc != 0
