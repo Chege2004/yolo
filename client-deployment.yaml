@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: client
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: client
@@ -17,7 +17,7 @@ spec:
         image: manasseh2004/client:v1.1.0
         resources:
           limits:
-            memory: "128Mi"
+            memory: "512Mi"
             cpu: "500m"
         ports:
         - containerPort: 3000
