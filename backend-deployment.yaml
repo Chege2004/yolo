@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: backend
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
       - name: backend
-        image: manasseh2004/backend:v1.1.o
+        image: manasseh2004/backend:v1.1.0 
         resources:
           limits:
-            memory: "128Mi"
+            memory: "512Mi"
             cpu: "500m"
         ports:
         - containerPort: 5000
