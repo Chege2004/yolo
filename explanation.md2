@@ -1,0 +1,111 @@
+# KUBERNETES AND AWS
+# FOR THE CLOUD I USED AWS AS FOLLOWS:
+Having had th dockerfile for both client and backend I build the images and pushed them to dockerhub.
+I created an AWS account and created a new user which I used for AWS config.
+This are the guidelines on how I run the project:
+# 1 CREATION OF A CLUSTER 
+The initial step was to create a IAM role  for my project within the AWS console and I achieved this by doing the command : eksctl create iamidentitymapping --cluster <cluster-name> --arn <role-arn> --username <username>
+The cluster name for the cluster I created was IP-4-CLUSTER.Within this cluster I am going to configure everything about my project. The clusterI created was an EKS cluster :eksctl create cluster --name your-cluster-name --region your-region --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4 --managed
+Next I ceated the deployment and service yaml files for the client and backend here is how I went about it.
+
+# DEPLYOMENT FOR THE CLIENT AND BACKEND
+apiVersion: apps/v1
+This specifies the version of the Kubernetes API that you're using to create this resource. apps/v1 is the stable version for managing deployments.
+
+kind: Deployment
+This indicates the type of Kubernetes resource you're creating. In this case, it’s a Deployment, which manages a set of replicated Pods.
+
+metadata
+The metadata section contains data that helps uniquely identify the Deployment.
+
+name: client: This sets the name of the Deployment to "client".
+spec
+The spec section defines the desired state of the Deployment.
+
+replicas: 1
+This specifies the number of pod replicas that the Deployment should maintain. Here, it is set to 1, meaning only one instance of the Pod will be running.
+
+selector
+The selector field is used to identify which Pods belong to this Deployment.
+
+matchLabels: This specifies that the Pods with the label app: client should be managed by this Deployment.
+template
+The template field describes the Pods that will be created by the Deployment.
+
+metadata
+This metadata section within the template contains labels that will be applied to the Pods.
+
+labels: Labels are key-value pairs that are attached to objects, such as Pods, and used for identifying and organizing them. Here, each Pod created by this Deployment will have the label app: client.
+spec
+This spec section within the template defines the specification of the Pods.
+
+containers: This field lists the containers that will run inside the Pod. Each container has its own configuration.
+- name: client
+This sets the name of the container to "client".
+
+- image: manasseh2004/client
+.1.0
+This specifies the Docker image to use for the container. manasseh2004/client:v1.1.0 is the image pulled from the Docker registry, tagged with version v1.1.0.
+
+- resources
+This section defines the resource limits for the container. Resource limits help manage the resources (CPU and memory) that a container can use.
+
+limits: This specifies the maximum amount of resources that the container can use.
+memory: "512Mi": This sets the maximum memory limit to 512 MiB.
+cpu: "500m": This sets the maximum CPU limit to 500 millicores (or 0.5 of a CPU core).
+- ports
+This specifies the network ports the container exposes.
+
+containerPort: 3000: This indicates that the container listens on port 3000.
+Summary
+The Deployment named "client" will maintain a single Pod running.
+This Pod will run a container named "client", which uses the Docker image manasseh2004/client:v1.1.0.
+The container is limited to using a maximum of 512 MiB of memory and 500 millicores of CPU.
+The container listens on port 3000.
+The Deployment ensures that if the Pod fails or is deleted, a new Pod is created to match the desired state of having one replica.
+
+The deployment above is still the same in consideration of the backend.
+
+# SERVICE FOR THE FRONTEND AND BACKEND 
+apiVersion: v1
+This specifies the version of the Kubernetes API that you're using to create this resource. v1 is the stable version for core Kubernetes objects such as Services.
+
+kind: Service
+This indicates the type of Kubernetes resource you're creating. In this case, it’s a Service, which provides network access to a set of Pods.
+
+metadata
+The metadata section contains data that helps uniquely identify the Service.
+
+name: client: This sets the name of the Service to "client".
+spec
+The spec section defines the desired state of the Service.
+
+selector
+The selector field is used to identify which Pods this Service should route traffic to.
+
+app: client: This specifies that the Service will target Pods with the label app: client.
+ports
+The ports field defines the network ports that the Service will expose and route traffic to.
+
+protocol: TCP: This specifies the protocol used for the Service. In this case, it is TCP.
+port: 70: This sets the port on which the Service will be accessible. External clients will connect to this port.
+targetPort: 3000: This specifies the port on the Pods that the traffic will be forwarded to. The application inside the Pods listens on port 3000.
+type: LoadBalancer
+The type field specifies how the Service is exposed.
+
+LoadBalancer: This creates an external load balancer (if supported by the cloud provider) that routes traffic to the Pods. This type makes the Service accessible from outside the Kubernetes cluster.
+Summary
+The Service named "client" is designed to expose and provide network access to Pods with the label app: client.
+It listens on port 70 for incoming TCP traffic.
+Traffic received on port 70 will be forwarded to port 3000 on the target Pods.
+The Service type is LoadBalancer, which means it will provision an external load balancer to make the service accessible from outside the Kubernetes cluster.
+By using this configuration, you can expose your client application to the internet via a load balancer, allowing external users to access it through the specified external IP address or DNS name provided by the load balancer.
+ 
+ This is the same configuration for setting up the all the services 
+
+ Below is the external ip for the configuration
+https://C313E600A68F4CF3FBCB493B3A03B651.gr7.us-east-1.eks.amazonaws.com
+
+
+
+
